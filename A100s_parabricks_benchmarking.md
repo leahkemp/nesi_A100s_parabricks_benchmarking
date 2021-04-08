@@ -1,7 +1,7 @@
 # Calculate mapping metrics
 
 Created: 2021/04/06 17:17:47
-Last modified: 2021/04/08 17:45:30
+Last modified: 2021/04/08 17:46:37
 
 - **Aim:** Benchmarking the performance (speed) of the A100's on NeSi analysing public whole genome sequence (WSG) data
 - **Prerequisite software:**
@@ -21,7 +21,7 @@ Last modified: 2021/04/08 17:45:30
     - [Export paths](#export-paths)
     - [Test parabricks is running](#test-parabricks-is-running)
   - [Run genomes through parabricks](#run-genomes-through-parabricks)
-    - [Sample data from NVIDIA on 8 GPUs](#sample-data-from-nvidia-on-8-gpus)
+    - [Sample data from NVIDIA on 2 GPUs](#sample-data-from-nvidia-on-2-gpus)
     - [A single whole genome on 2 GPUs](#a-single-whole-genome-on-2-gpus)
     - [A single whole genome on 8 GPUS](#a-single-whole-genome-on-8-gpus)
     - [Watch the gpus running](#watch-the-gpus-running)
@@ -309,7 +309,7 @@ The Parabricks binary can be found at `/nesi/project/nesi03181/SW/parabricks/pbr
 
 ## Run genomes through parabricks
 
-### Sample data from NVIDIA on 8 GPUs
+### Sample data from NVIDIA on 2 GPUs
 
 ```bash
 cd /nesi/project/nesi03181/SW/parabricks
