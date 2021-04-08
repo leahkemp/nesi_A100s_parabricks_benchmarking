@@ -1,7 +1,7 @@
 # A100's parabricks benchmarking
 
 Created: 2021/04/06 17:17:47
-Last modified: 2021/04/09 09:29:04
+Last modified: 2021/04/09 09:53:09
 
 - **Aim:** Benchmarking the performance (speed) of the A100's on NeSi analysing public whole genome sequence (WSG) data
 - **Prerequisite software:**
@@ -23,9 +23,10 @@ Last modified: 2021/04/09 09:29:04
   - [Run genomes through parabricks](#run-genomes-through-parabricks)
     - [Sample data from NVIDIA on 2 GPUs](#sample-data-from-nvidia-on-2-gpus)
     - [A single whole genome on 2 GPUs](#a-single-whole-genome-on-2-gpus)
+    - [A single whole genome on 2 GPUs (repeat to test for variance)](#a-single-whole-genome-on-2-gpus-repeat-to-test-for-variance)
     - [A single whole genome on 8 GPUS](#a-single-whole-genome-on-8-gpus)
-    - [Watch the gpus running](#watch-the-gpus-running)
-    - [Cancel interactive slurm session](#cancel-interactive-slurm-session)
+  - [Watch the gpus running](#watch-the-gpus-running)
+  - [Cancel interactive slurm session](#cancel-interactive-slurm-session)
 
 ## Overview
 
@@ -1462,6 +1463,38 @@ Total runtime:
 - 201 minutes
 - 3.35 hours
 
+### A single whole genome on 2 GPUs (repeat to test for variance)
+
+```bash
+# Start interactive slurm session with 8 GPUS
+srun --account nesi03181 --job-name pbtest --mem 200G --cpus-per-task 8 --gres=gpu:A100:2 --qos=testing --time 04:00:00 --pty bash
+
+# Load modules
+module load Singularity/3.7.1 CUDA/11.2.0 Python
+
+# Set paths
+export SINGULARITYENV_LD_LIBRARY_PATH="\${LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}"
+export SINGULARITY_BIND="/cm/local/apps/cuda,${EBROOTCUDA}"
+
+# Run pipeline
+cd /nesi/project/nesi03181/
+
+./SW/parabricks/pbrun germline \
+--ref /nesi/project/nesi03181/PBDATA/REFERENCE/human_g1k_v37_decoy.fasta \
+--in-fq /nesi/project/nesi03181/PBDATA/MPHG007-23100082/HGHG007_S6_L006_R1_001.fastq.gz /nesi/project/nesi03181/PBDATA/MPHG007-23100082/HGHG007_S6_L006_R2_001.fastq.gz \
+--knownSites /nesi/project/nesi03181/PBDATA/REFERENCE/1000G_phase1.indels.b37.vcf.gz \
+--knownSites /nesi/project/nesi03181/PBDATA/REFERENCE/Mills_and_1000G_gold_standard.indels.b37.vcf.gz \
+--out-bam /nesi/project/nesi03181/PBDATA/output.bam \
+--out-variants /nesi/project/nesi03181/PBDATA/output.vcf \
+--out-recal-file /nesi/project/nesi03181/PBDATA/report.txt
+```
+
+My output:
+
+```bash
+
+```
+
 ### A single whole genome on 8 GPUS
 
 Looks like I can't request that many GPU's
@@ -1472,26 +1505,7 @@ srun: error: MaxGRESPerAccount
 srun: error: Unable to allocate resources: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)
 ```
 
-```bash
-# Start screen
-screen -S pbricks
-
-# Start interactive slurm session with 8 GPUS
-srun --account nesi03181 --job-name pbtest --mem 200G --cpus-per-task 8 --gres=gpu:A100:8 --qos=testing --time 01:00:00 --pty bash
-
-# Load modules
-module load Singularity/3.7.1 CUDA/11.2.0 Python
-
-# Set paths
-export SINGULARITYENV_LD_LIBRARY_PATH="\${LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}"
-export SINGULARITY_BIND="/cm/local/apps/cuda,${EBROOTCUDA}"
-```
-
-```bash
-
-```
-
-### Watch the gpus running
+## Watch the gpus running
 
 In a new session I can ssh into mahuika cluster again, ssh directly to the wbl009 node and run nvidia-smi (first I'll need to load the CUDA module)
 
@@ -1510,7 +1524,7 @@ Or even better, I can get some sweet plots
 nvtop
 ```
 
-### Cancel interactive slurm session
+## Cancel interactive slurm session
 
 Once finished, cancel the interactive slurm session and free up the resources
 
