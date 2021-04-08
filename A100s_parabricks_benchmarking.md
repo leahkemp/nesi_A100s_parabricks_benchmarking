@@ -1,7 +1,7 @@
-# Calculate mapping metrics
+# A100's parabricks benchmarking
 
 Created: 2021/04/06 17:17:47
-Last modified: 2021/04/08 17:46:37
+Last modified: 2021/04/08 17:47:27
 
 - **Aim:** Benchmarking the performance (speed) of the A100's on NeSi analysing public whole genome sequence (WSG) data
 - **Prerequisite software:**
@@ -9,7 +9,7 @@ Last modified: 2021/04/08 17:46:37
 
 ## Table of contents
 
-- [Calculate mapping metrics](#calculate-mapping-metrics)
+- [A100's parabricks benchmarking](#a100s-parabricks-benchmarking)
   - [Table of contents](#table-of-contents)
   - [Overview](#overview)
   - [Getting onto NeSi](#getting-onto-nesi)
