@@ -1,11 +1,11 @@
 # A100's parabricks benchmarking
 
 Created: 2021/04/06 17:17:47
-Last modified: 2021/04/09 14:30:10
+Last modified: 2021/04/19 12:21:22
 
-- **Aim:** Benchmarking the performance (speed) of the A100's on NeSi analysing public whole genome sequence (WSG) data
+- **Aim:** Benchmarking the performance (speed) of the [A100's](https://www.nvidia.com/en-us/data-center/a100/) on [NeSi](https://www.nesi.org.nz/) analysing public whole genome sequence (WSG) data
 - **Prerequisite software:**
-- **OS:** ESR cluster (CentOS Linux 7)
+- **OS:**
 
 ## Table of contents
 
@@ -27,16 +27,15 @@ Last modified: 2021/04/09 14:30:10
     - [A single whole genome on 8 GPUS](#a-single-whole-genome-on-8-gpus)
   - [Watch the gpus running](#watch-the-gpus-running)
   - [Cancel interactive slurm session](#cancel-interactive-slurm-session)
+  - [More documentation](#more-documentation)
 
 ## Overview
-
-Up till now, we have run our 
 
 NeSi has 8x [NVIDIA A100 GPU's](https://www.nvidia.com/en-us/data-center/a100/)
 
 ## Getting onto NeSi
 
-I've currently got it set up so that I can connect to NeSi via Wintermute. I ended up doing this because I had some difficulties installing a linux subsystem on my ESR laptop
+I've currently got it set up so that I can connect to NeSi via Wintermute (one of ESR's research servers). I ended up doing this because I had some difficulties installing a linux subsystem on my ESR laptop, because Windows and IT
 
 My current ssh config file:
 
@@ -104,11 +103,13 @@ drwxrws---+ 3 dsen018  nesi03181 4.0K Mar 31 19:16 SW
 
 Miles has already transferred the human reference data (b37) to `/nesi/project/nesi03181/PBDATA/REFERENCE/` and the public genomes to run through parabricks to `/nesi/project/nesi03181/PBDATA/`
 
-Have a look:
+Let's have a look:
 
 ```bash
 ls -lh /nesi/project/nesi03181/PBDATA/REFERENCE/
 ```
+
+My output:
 
 ```bash
 total 30G
@@ -167,6 +168,8 @@ total 30G
 ls -lh /nesi/project/nesi03181/PBDATA/MPHG007-23100082/
 ```
 
+My output:
+
 ```bash
 total 36G
 -rw-rw----+ 1 dsen018 nesi03181 18G Jul 31  2015 HGHG007_S6_L006_R1_001.fastq.gz
@@ -176,6 +179,8 @@ total 36G
 ```bash
 ls -lh /nesi/project/nesi03181/PBDATA/MPHG007-23110112/
 ```
+
+My output:
 
 ```bash
 total 38G
@@ -221,6 +226,8 @@ cd ../MPHG006-23110111
 wget https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/ChineseTrio/HG006_NA24694-huCA017E_father/NIST_Stanford_Illumina_6kb_matepair/fastqs/MPHG006-23110111/MPHG006_S5_L005_R1_001.fastq.gz
 wget https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/ChineseTrio/HG006_NA24694-huCA017E_father/NIST_Stanford_Illumina_6kb_matepair/fastqs/MPHG006-23110111/MPHG006_S5_L005_R2_001.fastq.gz
 ```
+
+*Note. the above code didn't work when run on Mahuika (NeSi) or Wintermute (ESR research server)*
 
 A summary of the individuals in the trio:
 
@@ -268,7 +275,7 @@ Currently Loaded Modules:
 
 ```
 
-Parabricks is containerised (in a singularity container) so we're gonna need Singularity to interact with it
+Parabricks is containerised (in a singularity container) so we're gonna need Singularity to interact with parabricks
 
 ```bash
 module load Singularity/3.7.1 CUDA/11.2.0 Python
@@ -293,7 +300,7 @@ Great
 
 ### Export paths
 
-This is required to bind the paths to the singularity container, Dini could set this up in the build for the non-trial version of parabricks, but it's too much unnecesary work for now
+This is required to bind the paths to the singularity container, Dini could set this up to be done automatically in the build for the non-trial version of parabricks, but it's too much unnecessary work for now while we're just using a trial licence
 
 ```bash
 export SINGULARITYENV_LD_LIBRARY_PATH="\${LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}"
@@ -308,6 +315,8 @@ The Parabricks binary can be found at `/nesi/project/nesi03181/SW/parabricks/pbr
 /nesi/project/nesi03181/SW/parabricks/pbrun --help
 ```
 
+Looks good
+
 ## Run genomes through parabricks
 
 ### Sample data from NVIDIA on 2 GPUs
@@ -321,7 +330,7 @@ cd /nesi/project/nesi03181/SW/parabricks
 --out-bam /nesi/nobackup/nesi03181/PB_SAMPLE_DATA/parabricks_sample/out/output.bam
 ```
 
-My output
+My output:
 
 ```bash
 [lkemp@wbl009 parabricks]$ ./pbrun fq2bam --ref /nesi/nobackup/nesi03181/PB_SAMPLE_DATA/parabricks_sample/Ref/Homo_sapiens_assembly38.fasta --in
@@ -680,7 +689,7 @@ cd /nesi/project/nesi03181/
 --out-recal-file /nesi/project/nesi03181/PBDATA/report.txt
 ```
 
-Error out again, ran out of time
+Error out again, slurm ran out of time this time, I'll give it more time
 
 ```bash
 # Start interactive slurm session with 8 GPUS
@@ -2229,6 +2238,8 @@ srun: error: MaxGRESPerAccount
 srun: error: Unable to allocate resources: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)
 ```
 
+We talked to Dini and it turns out the 8xA100's are physically on different machines, parabricks require the GPU's to be on the same physical machine in order to use them for the same sample. Therefore, the maximum number of GPU's we can request from slurm is 2.
+
 ## Watch the gpus running
 
 In a new session I can ssh into mahuika cluster again, ssh directly to the wbl009 node and run nvidia-smi (first I'll need to load the CUDA module)
@@ -2241,6 +2252,8 @@ ssh wbl009
 module load CUDA
 watch nvidia-smi
 ```
+
+*Note. it wasn't always wbl009 I had to ssh into, sometimes the interactive session sent me to a different machine, I suppose one of the other servers that also have 2xA100's on them*
 
 Or even better, I can get some sweet plots
 
@@ -2256,3 +2269,8 @@ Once finished, cancel the interactive slurm session and free up the resources
 exit
 ```
 
+## More documentation
+
+Dini and I (mainly Dini) put together this document while we were going through this process: https://hackmd.io/40uk2vc5TPq6O_-c-gpPbQ?view
+
+It has some sweet plots of the resource use when running tests on parabricks on these A100's
