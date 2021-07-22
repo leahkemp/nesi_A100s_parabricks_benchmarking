@@ -4,4 +4,4 @@ Benchmarking [parabricks](https://developer.nvidia.com/clara-parabricks) on [NVI
 
 See:
 
-- [benchmarking](A100s_parabricks_benchmarking.md)
+- [Benchmarking](A100s_parabricks_benchmarking.md)
